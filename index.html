@@ -85,7 +85,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Illinois School Districts<br>Median Income vs Teacher Salary</h1>
+        <h1>Illinois School Districts<br>Avg Household Income vs Avg Teacher Salary</h1>
         <div class="subtitle">2019-2023 ACS 5-year average income data & Illinois teacher salaries</div>
 
         <div class="chart-wrapper">
@@ -98,11 +98,11 @@
 
         <div class="stats">
             <div class="stat-box">
-                <h3>Average Household Income (2019-2023)</h3>
+                <h3>Avg Household Income (2019-2023)</h3>
                 <div id="incomeStats">Loading...</div>
             </div>
             <div class="stat-box">
-                <h3>Teacher Salary</h3>
+                <h3>Avg Teacher Salary</h3>
                 <div id="salaryStats">Loading...</div>
             </div>
         </div>
@@ -111,8 +111,8 @@
             <thead>
                 <tr>
                     <th>District</th>
-                    <th>Average Household Income</th>
-                    <th>Teacher Salary</th>
+                    <th>Avg Household Income</th>
+                    <th>Avg Teacher Salary</th>
                     <th>Salary Source</th>
                 </tr>
             </thead>
@@ -431,7 +431,7 @@
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Average Household Income vs Average Teacher Salary',
+                        text: 'Avg Household Income vs Avg Teacher Salary',
                         font: { size: 16, weight: 'bold' }
                     },
                     legend: { display: false },
@@ -453,7 +453,7 @@
                     x: {
                         title: {
                             display: true,
-                            text: 'Average Household Income ($)',
+                            text: 'Avg Household Income ($)',
                             font: { weight: 'bold' }
                         },
                         ticks: {
@@ -465,7 +465,7 @@
                     y: {
                         title: {
                             display: true,
-                            text: 'Average Teacher Salary ($)',
+                            text: 'Avg Teacher Salary ($)',
                             font: { weight: 'bold' }
                         },
                         ticks: {
