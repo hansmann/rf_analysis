@@ -1,18 +1,33 @@
-District,Median_Income,Avg_Teacher_Salary
-"River Forest SD 90",135000,85000
-"Elmhurst CUSD 205",95000,72000
-"Downers Grove GSD 58",105000,78000
-"Hinsdale CCSD 181",180000,95000
-"Oak Park ESD 97",85000,75000
-"Lake Forest SD 67",165000,90000
-"Glenview CCSD 34",125000,82000
-"La Grange SD 102",140000,88000
-"Evanston/Skokie SD 65",90000,70000
-"Northbrook SD 28",155000,87000
-"Berwyn South SD 100",55000,65000
-"Elmwood Park CUSD 401",68000,68000
-"Naperville CUSD 203",115000,80000
-"Wheaton CUSD 200",88000,73000
-"Deerfield SD 109",170000,92000
-"Oak Brook (Butler 53)",190000,98000
-"Park Ridge CCSD 64",110000,79000
+District,Average_Household_Income,Avg_Teacher_Salary
+"River Forest SD 90",245054,77631
+"Hinsdale CCSD 181",376366,98222
+"Winnetka SD 36",457404,98072
+"Lake Forest SD 67",302171,89256
+"Elmwood Park CUSD 401",101036,83681
+"Berwyn South SD 100",94096,67419
+"Forest Park SD 91",109157,77941
+"Melrose Park ESD 89",64740,73406
+"Kenilworth SD 38",460411,103079
+"Oak Park ESD 97",157707,85619
+"Evanston/Skokie SD 65",159197,91558
+"Downers Grove GSD 58",163851,91729
+"Wheaton CUSD 200",165445,78013
+"Deerfield SD 109",246543,83273
+"Oak Brook (Butler 53)",264446,86720
+"Park Ridge CCSD 64",187830,94637
+"Elmhurst CUSD 205",200730,93125
+"Northbrook SD 28",218418,97923
+"Glenview CCSD 34",199761,81377
+"Wilmette SD 39",291930,86561
+"Highland Park SD 112",247484,82199
+"Barrington CUSD 220",209856,93926
+"Arlington Heights SD 25",147683,78022
+"Cicero SD 99",83618,85635
+"Bellwood SD 88",90217,63145
+"Northlake SD 92",85122,54053
+"La Grange SD 102",210646,75978
+"Burr Ridge SD 180",242236,76259
+"Naperville CUSD 203",192516,88756
+"Glen Ellyn SD 41",190562,87335
+"Northfield SD 31",281510,79132
+"Glencoe SD 35",413718,102049

@@ -7,8 +7,8 @@ echo "Deploying Illinois School Districts Analysis to GitHub Pages..."
 # Navigate to your project directory (adjust path if needed)
 cd /Users/willhansmann/code/teachers
 
-# Copy the chart file to index.html to make it the main page
-cp final_accurate_chart.html index.html
+# index.html is already the main page with updated data
+# No need to copy - index.html has the latest updates
 
 # Initialize git if not already done
 if [ ! -d ".git" ]; then
@@ -23,7 +23,7 @@ git add .
 git commit -m "Add Illinois school districts income vs teacher salary analysis
 
 - Interactive chart with 25+ districts
-- Real data from US Census 2023 and Illinois ISBE
+- Updated with 2019-2023 ACS 5-year average income data and latest teacher salaries
 - Shows correlation between community wealth and teacher compensation
 - Highlights River Forest SD 90 in analysis"
 
