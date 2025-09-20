@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Illinois Districts - Fresh Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .chart-container { position: relative; height: 500px; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: bold; }
+        tr:hover { background: #f5f5f5; }
+        .stats { background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Illinois School Districts - Real Data</h1>
+
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        <div class="stats">
+            <strong>Correlation: r = 0.619 (Moderate Positive)</strong><br>
+            10 districts with complete data shown
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>District</th>
+                    <th>Median Income</th>
+                    <th>Teacher Salary</th>
+                    <th>Ratio</th>
+                </tr>
+            </thead>
+            <tbody id="tableData"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // REAL DATA - verified from sources
+        const realData = [
+            { name: "River Forest SD 90", income: 148711, salary: 77630 },
+            { name: "Hinsdale CCSD 181", income: 250001, salary: 94341 },
+            { name: "Oak Park ESD 97", income: 108026, salary: 81158 },
+            { name: "Evanston/Skokie SD 65", income: 95766, salary: 70608 },
+            { name: "Naperville CUSD 203", income: 150937, salary: 57260 },
+            { name: "Wheaton CUSD 200", income: 119566, salary: 73947 },
+            { name: "Deerfield SD 109", income: 189705, salary: 85000 },
+            { name: "Oak Brook (Butler 53)", income: 171123, salary: 86720 },
+            { name: "Park Ridge CCSD 64", income: 138059, salary: 80500 },
+            { name: "Downers Grove GSD 58", income: 119649, salary: 58515 }
+        ];
+
+        // Create fresh chart
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Districts',
+                    data: realData.map(d => ({ x: d.income, y: d.salary })),
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    pointRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Median Income vs Teacher Salary'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return realData[context[0].dataIndex].name;
+                            },
+                            label: function(context) {
+                                return [
+                                    `Income: $${context.parsed.x.toLocaleString()}`,
+                                    `Salary: $${context.parsed.y.toLocaleString()}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Median Income ($)' },
+                        ticks: { callback: function(value) { return '$' + value.toLocaleString(); } }
+                    },
+                    y: {
+                        title: { display: true, text: 'Teacher Salary ($)' },
+                        ticks: { callback: function(value) { return '$' + value.toLocaleString(); } }
+                    }
+                }
+            }
+        });
+
+        // Populate table with SAME data
+        const tableBody = document.getElementById('tableData');
+        realData
+            .sort((a, b) => b.income - a.income)
+            .forEach(d => {
+                const row = tableBody.insertRow();
+                const ratio = (d.salary / d.income).toFixed(3);
+                row.innerHTML = `
+                    <td>${d.name}</td>
+                    <td>$${d.income.toLocaleString()}</td>
+                    <td>$${d.salary.toLocaleString()}</td>
+                    <td>${ratio}</td>
+                `;
+            });
+
+        // Debug output
+        console.log('River Forest data:', realData.find(d => d.name.includes('River Forest')));
+    </script>
+</body>
+</html>

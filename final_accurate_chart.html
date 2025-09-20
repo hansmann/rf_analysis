@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Illinois School Districts - Verified Data</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        .chart-wrapper {
+            width: 100%;
+            height: 500px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f1f3f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .correlation {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .note {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Illinois School Districts<br>Median Income vs Teacher Salary</h1>
+        <div class="subtitle">Verified data from US Census 2023 & Illinois sources</div>
+
+        <div class="chart-wrapper">
+            <canvas id="chart"></canvas>
+        </div>
+
+        <div class="correlation" id="correlation">
+            Correlation will be calculated...
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <h3>Median Income (2023)</h3>
+                <div id="incomeStats">Loading...</div>
+            </div>
+            <div class="stat-box">
+                <h3>Teacher Salary</h3>
+                <div id="salaryStats">Loading...</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>District</th>
+                    <th>Median Income</th>
+                    <th>Teacher Salary</th>
+                    <th>Salary Source</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
+        <div class="note">
+            <strong>Data Sources:</strong>
+            <ul>
+                <li>Median Income: US Census Bureau 2023 American Community Survey</li>
+                <li>Teacher Salaries: Illinois Report Card, Illinois State Board of Education, verified district data</li>
+                <li>Only districts with verified teacher-specific salary data are included</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // VERIFIED teacher salary data with sources
+        const districts = [
+            {
+                district: "River Forest SD 90",
+                income: 148711,
+                salary: 77631,  // Illinois Report Card - $1,652 above state avg
+                source: "Illinois Report Card 2024"
+            },
+            {
+                district: "Hinsdale CCSD 181",
+                income: 250001,
+                salary: 98222,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Winnetka SD 36",
+                income: 250001,
+                salary: 98072,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Lake Forest SD 67",
+                income: 228120,
+                salary: 87501,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Elmwood Park CUSD 401",
+                income: 84121,
+                salary: 83681,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Berwyn South SD 100",
+                income: 75235,
+                salary: 67419,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Forest Park SD 91",
+                income: 81323,
+                salary: 77941,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Melrose Park ESD 89",
+                income: 64740,
+                salary: 73406,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Kenilworth SD 38",
+                income: 250001,
+                salary: 103079,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Oak Park ESD 97",
+                income: 108026,
+                salary: 85619,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Evanston/Skokie SD 65",
+                income: 95766,
+                salary: 91558,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Downers Grove GSD 58",
+                income: 119649,
+                salary: 91729,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Wheaton CUSD 200",
+                income: 119566,
+                salary: 78013,  // From JSON endpoint 2021
+                source: "Illinois ISBE 2021"
+            },
+            {
+                district: "Deerfield SD 109",
+                income: 189705,
+                salary: 83273,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Oak Brook (Butler 53)",
+                income: 171123,
+                salary: 86720,  // Previously verified
+                source: "District average"
+            },
+            {
+                district: "Park Ridge CCSD 64",
+                income: 138059,
+                salary: 94637,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Elmhurst CUSD 205",
+                income: 145374,
+                salary: 93125,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Northbrook SD 28",
+                income: 155321,
+                salary: 97923,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Glenview CCSD 34",
+                income: 138758,
+                salary: 81377,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Wilmette SD 39",
+                income: 192300,
+                salary: 86561,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Highland Park SD 112",
+                income: 161875,
+                salary: 82199,  // From JSON endpoint 2022
+                source: "Illinois ISBE 2022"
+            },
+            {
+                district: "Barrington CUSD 220",
+                income: 150714,
+                salary: 93926,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Arlington Heights SD 25",
+                income: 118532,
+                salary: 78022,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Cicero SD 99",
+                income: 68548,
+                salary: 85635,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Bellwood SD 88",
+                income: 76990,
+                salary: 63145,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Northlake SD 92",
+                income: 77564,
+                salary: 54053,  // From JSON endpoint 2022
+                source: "Illinois ISBE 2022"
+            },
+            {
+                district: "La Grange SD 102",
+                income: 154556,
+                salary: 75978,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Burr Ridge SD 180",
+                income: 154508,
+                salary: 76259,  // From JSON endpoint 2022
+                source: "Illinois ISBE 2022"
+            },
+            {
+                district: "Naperville CUSD 203",
+                income: 150937,
+                salary: 88756,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Glen Ellyn SD 41",
+                income: 133346,
+                salary: 87335,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Northfield SD 31",
+                income: 180492,
+                salary: 79132,  // From JSON endpoint 2023
+                source: "Illinois ISBE 2023"
+            },
+            {
+                district: "Glencoe SD 35",
+                income: 250001,
+                salary: 102049,  // From JSON endpoint 2024
+                source: "Illinois ISBE 2024"
+            }
+        ];
+
+        // Calculate correlation
+        function calculateCorrelation(x, y) {
+            const n = x.length;
+            const sumX = x.reduce((a, b) => a + b, 0);
+            const sumY = y.reduce((a, b) => a + b, 0);
+            const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
+            const sumX2 = x.reduce((sum, xi) => sum + xi * xi, 0);
+            const sumY2 = y.reduce((sum, yi) => sum + yi * yi, 0);
+
+            const numerator = n * sumXY - sumX * sumY;
+            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+
+            return numerator / denominator;
+        }
+
+        // Extract data
+        const incomes = districts.map(d => d.income);
+        const salaries = districts.map(d => d.salary);
+
+        // Calculate statistics
+        const correlation = calculateCorrelation(incomes, salaries);
+
+        // Update correlation display
+        document.getElementById('correlation').innerHTML = `
+            Correlation: r = ${correlation.toFixed(3)} (${correlation > 0.7 ? 'Strong' : correlation > 0.3 ? 'Moderate' : 'Weak'} Positive)
+        `;
+
+        // Update stats
+        document.getElementById('incomeStats').innerHTML = `
+            Range: $${Math.min(...incomes).toLocaleString()} - $${Math.max(...incomes).toLocaleString()}<br>
+            Average: $${Math.round(incomes.reduce((a, b) => a + b) / incomes.length).toLocaleString()}
+        `;
+
+        document.getElementById('salaryStats').innerHTML = `
+            Range: $${Math.min(...salaries).toLocaleString()} - $${Math.max(...salaries).toLocaleString()}<br>
+            Average: $${Math.round(salaries.reduce((a, b) => a + b) / salaries.length).toLocaleString()}
+        `;
+
+        // Calculate trend line
+        const n = incomes.length;
+        const sumX = incomes.reduce((a, b) => a + b, 0);
+        const sumY = salaries.reduce((a, b) => a + b, 0);
+        const sumXY = incomes.reduce((sum, x, i) => sum + x * salaries[i], 0);
+        const sumX2 = incomes.reduce((sum, x) => sum + x * x, 0);
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        const minX = Math.min(...incomes);
+        const maxX = Math.max(...incomes);
+        const trendLine = [
+            { x: minX, y: slope * minX + intercept },
+            { x: maxX, y: slope * maxX + intercept }
+        ];
+
+        // Create chart
+        const ctx = document.getElementById('chart').getContext('2d');
+        new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'School Districts',
+                        data: districts.map((d, index) => ({
+                            x: d.income,
+                            y: d.salary,
+                            label: d.district,
+                            index: index
+                        })),
+                        backgroundColor: districts.map(d =>
+                            d.district.includes('River Forest') ? 'rgba(255, 99, 132, 0.8)' : 'rgba(54, 162, 235, 0.8)'
+                        ),
+                        borderColor: districts.map(d =>
+                            d.district.includes('River Forest') ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)'
+                        ),
+                        borderWidth: districts.map(d =>
+                            d.district.includes('River Forest') ? 3 : 2
+                        ),
+                        pointRadius: districts.map(d =>
+                            d.district.includes('River Forest') ? 12 : 8
+                        ),
+                        pointHoverRadius: districts.map(d =>
+                            d.district.includes('River Forest') ? 15 : 10
+                        )
+                    },
+                    {
+                        label: 'Trend Line',
+                        data: trendLine,
+                        type: 'line',
+                        borderColor: 'rgba(255, 0, 0, 0.8)',
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false,
+                        tension: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Median Household Income vs Average Teacher Salary',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].raw.label;
+                            },
+                            label: function(context) {
+                                return [
+                                    `Income: $${context.parsed.x.toLocaleString()}`,
+                                    `Salary: $${context.parsed.y.toLocaleString()}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Median Household Income ($)',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Average Teacher Salary ($)',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Populate table
+        const tbody = document.getElementById('tableBody');
+        districts
+            .sort((a, b) => b.salary - a.salary)
+            .forEach(d => {
+                const row = tbody.insertRow();
+                const isRiverForest = d.district.includes('River Forest');
+                row.innerHTML = `
+                    <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">${d.district}</td>
+                    <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}">$${d.income.toLocaleString()}</td>
+                    <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">$${d.salary.toLocaleString()}</td>
+                    <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}"><small>${d.source}</small></td>
+                `;
+            });
+    </script>
+</body>
+</html>

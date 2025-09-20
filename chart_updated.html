@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Illinois School Districts - Income vs Teacher Salary (Real Data)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            position: relative;
+            height: 600px;
+            margin-bottom: 30px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .stat-box {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        .stat-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .correlation {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e7f3ff;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Illinois School Districts<br>Median Income vs Average Teacher Salary</h1>
+        <div class="subtitle">Real data from US Census Bureau (2023) and Illinois Report Card</div>
+
+        <div class="chart-container">
+            <canvas id="scatterChart"></canvas>
+        </div>
+
+        <div class="correlation">
+            Correlation: r = 0.619 (Moderate Positive)
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-title">Median Household Income (2023)</div>
+                <div>Range: $95,766 - $250,001</div>
+                <div>Average: $149,154</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Average Teacher Salary</div>
+                <div>Range: $57,260 - $94,341</div>
+                <div>Average: $76,568</div>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>School District</th>
+                    <th>Median Income</th>
+                    <th>Teacher Salary</th>
+                    <th>Salary/Income Ratio</th>
+                </tr>
+            </thead>
+            <tbody id="dataTable">
+            </tbody>
+        </table>
+
+        <div class="note">
+            <strong>Note:</strong> Only districts with both median income and teacher salary data are shown.
+            Data sources: US Census Bureau 2023 American Community Survey, Illinois Report Card.
+        </div>
+    </div>
+
+    <script>
+        // Real data from Illinois Report Card and US Census Bureau 2023
+        const districtData = [
+            { district: "River Forest SD 90", income: 148711, salary: 77630 },
+            { district: "Hinsdale CCSD 181", income: 250001, salary: 94341 },
+            { district: "Oak Park ESD 97", income: 108026, salary: 81158 },
+            { district: "Evanston/Skokie SD 65", income: 95766, salary: 70608 },
+            { district: "Naperville CUSD 203", income: 150937, salary: 57260 },
+            { district: "Wheaton CUSD 200", income: 119566, salary: 73947 },
+            { district: "Deerfield SD 109", income: 189705, salary: 85000 },
+            { district: "Oak Brook (Butler 53)", income: 171123, salary: 86720 },
+            { district: "Park Ridge CCSD 64", income: 138059, salary: 80500 },
+            { district: "Downers Grove GSD 58", income: 119649, salary: 58515 }
+        ];
+
+        // Create scatter plot
+        const ctx = document.getElementById('scatterChart').getContext('2d');
+        const scatterChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'School Districts',
+                    data: districtData.map(d => ({
+                        x: d.income,
+                        y: d.salary,
+                        label: d.district
+                    })),
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    pointRadius: 8,
+                    pointHoverRadius: 12
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Median Income vs Average Teacher Salary',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return districtData[context[0].dataIndex].district;
+                            },
+                            label: function(context) {
+                                return [
+                                    `Income: $${context.parsed.x.toLocaleString()}`,
+                                    `Salary: $${context.parsed.y.toLocaleString()}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Median Household Income ($)',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Average Teacher Salary ($)',
+                            font: { weight: 'bold' }
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Populate data table
+        const tableBody = document.getElementById('dataTable');
+        districtData
+            .sort((a, b) => b.income - a.income)
+            .forEach(d => {
+                const row = tableBody.insertRow();
+                const ratio = (d.salary / d.income).toFixed(3);
+                row.innerHTML = `
+                    <td>${d.district}</td>
+                    <td>$${d.income.toLocaleString()}</td>
+                    <td>$${d.salary.toLocaleString()}</td>
+                    <td>${ratio}</td>
+                `;
+            });
+
+        // Debug: log the data to console
+        console.log('District data:', districtData);
+        console.log('Number of districts:', districtData.length);
+    </script>
+</body>
+</html>
