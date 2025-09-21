@@ -81,6 +81,28 @@
             color: #856404;
             border: 1px solid #ffeaa7;
         }
+        .performance-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+        .performance-section h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subject-selector {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .subject-selector label {
+            margin: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .subject-selector input[type="radio"] {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +149,61 @@
                 <li>Only districts with verified teacher-specific salary data are included</li>
                 <li>Income data from Point2Homes (ACS-based) and WorldPopulationReview</li>
             </ul>
+        </div>
+
+        <!-- Academic Performance Section -->
+        <div class="performance-section">
+            <h2>Academic Performance vs Teacher Salary Analysis</h2>
+            <div class="subtitle">2024 Illinois Assessment of Readiness (IAR) Results</div>
+
+            <div class="subject-selector">
+                <label>
+                    <input type="radio" name="subject" value="math" checked> Mathematics
+                </label>
+                <label>
+                    <input type="radio" name="subject" value="ela"> English Language Arts
+                </label>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="performanceChart"></canvas>
+            </div>
+
+            <div class="correlation" id="performanceCorrelation">
+                Performance correlation will be calculated...
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <h3>Academic Performance (2024)</h3>
+                    <div id="performanceStats">Loading...</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Performance vs Salary</h3>
+                    <div id="performanceSalaryStats">Loading...</div>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>District</th>
+                        <th>Avg Teacher Salary</th>
+                        <th id="performanceHeader">Math Proficiency (%)</th>
+                        <th>Data Year</th>
+                    </tr>
+                </thead>
+                <tbody id="performanceTableBody"></tbody>
+            </table>
+
+            <div class="note">
+                <strong>Performance Data Sources:</strong>
+                <ul>
+                    <li>Academic Performance: Illinois Assessment of Readiness (IAR) 2024</li>
+                    <li>Proficiency = % of students meeting or exceeding standards</li>
+                    <li>Limited to districts with available performance data</li>
+                </ul>
+            </div>
         </div>
     </div>
 
@@ -327,6 +404,228 @@
             }
         ];
 
+        // Academic performance data (2024 IAR results - % meeting or exceeding standards)
+        const performanceData = [
+            {
+                district: "River Forest SD 90",
+                salary: 77631,
+                mathProficiency: 66.8,
+                elaProficiency: 76.4,
+                dataYear: "2024"
+            },
+            {
+                district: "Kenilworth SD 38",
+                salary: 103079,
+                mathProficiency: 67.3,
+                elaProficiency: 75.2,
+                dataYear: "2024"
+            },
+            {
+                district: "Glencoe SD 35",
+                salary: 102049,
+                mathProficiency: 74.2,
+                elaProficiency: 74.1,
+                dataYear: "2024"
+            },
+            {
+                district: "Hinsdale CCSD 181",
+                salary: 98222,
+                mathProficiency: 77.1,
+                elaProficiency: 83.0,
+                dataYear: "2024"
+            },
+            {
+                district: "Winnetka SD 36",
+                salary: 98072,
+                mathProficiency: 72.0,
+                elaProficiency: 72.1,
+                dataYear: "2024"
+            },
+            {
+                district: "Northbrook SD 28",
+                salary: 97923,
+                mathProficiency: 74.3,
+                elaProficiency: 80.6,
+                dataYear: "2024"
+            },
+            {
+                district: "Park Ridge CCSD 64",
+                salary: 94637,
+                mathProficiency: 52.5,
+                elaProficiency: 65.1,
+                dataYear: "2024"
+            },
+            {
+                district: "Barrington CUSD 220",
+                salary: 93926,
+                mathProficiency: 51.1,
+                elaProficiency: 70.8,
+                dataYear: "2024"
+            },
+            {
+                district: "Elmhurst CUSD 205",
+                salary: 93125,
+                mathProficiency: 57.9,
+                elaProficiency: 67.6,
+                dataYear: "2024"
+            },
+            {
+                district: "Downers Grove GSD 58",
+                salary: 91729,
+                mathProficiency: 55.3,
+                elaProficiency: 61.5,
+                dataYear: "2024"
+            },
+            {
+                district: "Evanston/Skokie SD 65",
+                salary: 91558,
+                mathProficiency: 42.8,
+                elaProficiency: 53.5,
+                dataYear: "2024"
+            },
+            {
+                district: "Lake Forest SD 67",
+                salary: 89256,
+                mathProficiency: 62.1,
+                elaProficiency: 67.9,
+                dataYear: "2024"
+            },
+            {
+                district: "Naperville CUSD 203",
+                salary: 88756,
+                mathProficiency: 59.5,
+                elaProficiency: 72.8,
+                dataYear: "2024"
+            },
+            {
+                district: "Glen Ellyn SD 41",
+                salary: 87335,
+                mathProficiency: 56.5,
+                elaProficiency: 63.2,
+                dataYear: "2024"
+            },
+            {
+                district: "Oak Brook (Butler 53)",
+                salary: 86720,
+                mathProficiency: 75.3,
+                elaProficiency: 80.8,
+                dataYear: "2024"
+            },
+            {
+                district: "Wilmette SD 39",
+                salary: 86561,
+                mathProficiency: 64.3,
+                elaProficiency: 78.0,
+                dataYear: "2024"
+            },
+            {
+                district: "Cicero SD 99",
+                salary: 85635,
+                mathProficiency: 13.1,
+                elaProficiency: 23.6,
+                dataYear: "2024"
+            },
+            {
+                district: "Oak Park ESD 97",
+                salary: 85619,
+                mathProficiency: 44.8,
+                elaProficiency: 55.1,
+                dataYear: "2024"
+            },
+            {
+                district: "Elmwood Park CUSD 401",
+                salary: 83681,
+                mathProficiency: 24.8,
+                elaProficiency: 46.4,
+                dataYear: "2024"
+            },
+            {
+                district: "Deerfield SD 109",
+                salary: 83273,
+                mathProficiency: 63.9,
+                elaProficiency: 72.9,
+                dataYear: "2024"
+            },
+            {
+                district: "Highland Park SD 112",
+                salary: 82199,
+                mathProficiency: 51.5,
+                elaProficiency: 58.5,
+                dataYear: "2024"
+            },
+            {
+                district: "Glenview CCSD 34",
+                salary: 81377,
+                mathProficiency: 57.7,
+                elaProficiency: 64.5,
+                dataYear: "2024"
+            },
+            {
+                district: "Northlake SD 92 (Berkeley 87)",
+                salary: 54053,
+                mathProficiency: 14.2,
+                elaProficiency: 16.3,
+                dataYear: "2024"
+            },
+            {
+                district: "Arlington Heights SD 25",
+                salary: 78022,
+                mathProficiency: 51.0,
+                elaProficiency: 63.3,
+                dataYear: "2024"
+            },
+            {
+                district: "Wheaton CUSD 200",
+                salary: 78013,
+                mathProficiency: 49.7,
+                elaProficiency: 64.9,
+                dataYear: "2024"
+            },
+            {
+                district: "Forest Park SD 91",
+                salary: 77941,
+                mathProficiency: 22.0,
+                elaProficiency: 42.3,
+                dataYear: "2024"
+            },
+            {
+                district: "Burr Ridge SD 180",
+                salary: 76259,
+                mathProficiency: 10.4,
+                elaProficiency: 36.6,
+                dataYear: "2024"
+            },
+            {
+                district: "La Grange SD 102",
+                salary: 75978,
+                mathProficiency: 52.8,
+                elaProficiency: 67.1,
+                dataYear: "2024"
+            },
+            {
+                district: "Melrose Park ESD 89",
+                salary: 73406,
+                mathProficiency: 13.2,
+                elaProficiency: 30.0,
+                dataYear: "2024"
+            },
+            {
+                district: "Berwyn South SD 100",
+                salary: 67419,
+                mathProficiency: 24.2,
+                elaProficiency: 35.1,
+                dataYear: "2024"
+            },
+            {
+                district: "Bellwood SD 88",
+                salary: 63145,
+                mathProficiency: 8.6,
+                elaProficiency: 17.5,
+                dataYear: "2024"
+            }
+            // Additional districts will be added as data becomes available
+        ];
+
         // Calculate correlation
         function calculateCorrelation(x, y) {
             const n = x.length;
@@ -492,6 +791,184 @@
                     <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}"><small>${d.source}</small></td>
                 `;
             });
+
+        // Performance Chart Functionality
+        let performanceChart;
+        let currentSubject = 'math';
+
+        function createPerformanceChart(subject) {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+
+            if (performanceChart) {
+                performanceChart.destroy();
+            }
+
+            const data = performanceData.map(d => ({
+                x: d.salary,
+                y: subject === 'math' ? d.mathProficiency : d.elaProficiency,
+                label: d.district
+            }));
+
+            const subjectName = subject === 'math' ? 'Mathematics' : 'English Language Arts';
+
+            // Calculate regression line
+            const salaries = performanceData.map(d => d.salary);
+            const scores = performanceData.map(d => subject === 'math' ? d.mathProficiency : d.elaProficiency);
+
+            const n = salaries.length;
+            const sumX = salaries.reduce((a, b) => a + b, 0);
+            const sumY = scores.reduce((a, b) => a + b, 0);
+            const sumXY = salaries.reduce((sum, x, i) => sum + x * scores[i], 0);
+            const sumX2 = salaries.reduce((sum, x) => sum + x * x, 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const minSalary = Math.min(...salaries);
+            const maxSalary = Math.max(...salaries);
+            const regressionLine = [
+                { x: minSalary, y: slope * minSalary + intercept },
+                { x: maxSalary, y: slope * maxSalary + intercept }
+            ];
+
+            performanceChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'School Districts',
+                            data: data,
+                            backgroundColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 0.8)' : 'rgba(34, 139, 34, 0.8)'
+                            ),
+                            borderColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 1)' : 'rgba(34, 139, 34, 1)'
+                            ),
+                            borderWidth: data.map(d =>
+                                d.label.includes('River Forest') ? 3 : 2
+                            ),
+                            pointRadius: data.map(d =>
+                                d.label.includes('River Forest') ? 12 : 8
+                            )
+                        },
+                        {
+                            label: 'Regression Line',
+                            data: regressionLine,
+                            type: 'line',
+                            borderColor: 'rgba(255, 165, 0, 0.8)',
+                            backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${subjectName} Proficiency vs Avg Teacher Salary`,
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].raw.label;
+                                },
+                                label: function(context) {
+                                    return [
+                                        `Salary: $${context.parsed.x.toLocaleString()}`,
+                                        `${subjectName} Proficiency: ${context.parsed.y.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Avg Teacher Salary ($)',
+                                font: { weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000).toFixed(0) + 'k';
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: `${subjectName} Proficiency (%)`,
+                                font: { weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Update correlation (using already calculated arrays)
+            const correlation = calculateCorrelation(salaries, scores);
+
+            document.getElementById('performanceCorrelation').innerHTML = `
+                ${subjectName} Performance vs Salary Correlation: r = ${correlation.toFixed(3)}
+            `;
+
+            // Update stats
+            document.getElementById('performanceStats').innerHTML = `
+                Range: ${Math.min(...scores).toFixed(1)}% - ${Math.max(...scores).toFixed(1)}%<br>
+                Average: ${(scores.reduce((a, b) => a + b) / scores.length).toFixed(1)}%
+            `;
+
+            // Update table
+            updatePerformanceTable(subject);
+        }
+
+        function updatePerformanceTable(subject) {
+            const tbody = document.getElementById('performanceTableBody');
+            const header = document.getElementById('performanceHeader');
+
+            const subjectName = subject === 'math' ? 'Math' : 'ELA';
+            header.textContent = `${subjectName} Proficiency (%)`;
+
+            tbody.innerHTML = '';
+            performanceData
+                .sort((a, b) => {
+                    const aProficiency = subject === 'math' ? a.mathProficiency : a.elaProficiency;
+                    const bProficiency = subject === 'math' ? b.mathProficiency : b.elaProficiency;
+                    return bProficiency - aProficiency; // Sort by proficiency, highest first
+                })
+                .forEach(d => {
+                    const row = tbody.insertRow();
+                    const isRiverForest = d.district.includes('River Forest');
+                    const proficiency = subject === 'math' ? d.mathProficiency : d.elaProficiency;
+
+                    row.innerHTML = `
+                        <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">${d.district}</td>
+                        <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}">$${d.salary.toLocaleString()}</td>
+                        <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">${proficiency.toFixed(1)}%</td>
+                        <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}">${d.dataYear}</td>
+                    `;
+                });
+        }
+
+        // Subject selection event listeners
+        document.querySelectorAll('input[name="subject"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentSubject = this.value;
+                createPerformanceChart(currentSubject);
+            });
+        });
+
+        // Initialize performance chart
+        createPerformanceChart('math');
     </script>
 </body>
 </html>
