@@ -190,6 +190,7 @@
                         <th>District</th>
                         <th>Avg Teacher Salary</th>
                         <th id="performanceHeader">Math Proficiency (%)</th>
+                        <th>Performance per $100k</th>
                         <th>Data Year</th>
                     </tr>
                 </thead>
@@ -201,6 +202,7 @@
                 <ul>
                     <li>Academic Performance: Illinois Assessment of Readiness (IAR) 2024</li>
                     <li>Proficiency = % of students meeting or exceeding standards</li>
+                    <li>Performance per $100k = Proficiency percentage per $100,000 of teacher salary (efficiency metric)</li>
                     <li>Limited to districts with available performance data</li>
                 </ul>
             </div>
@@ -943,17 +945,21 @@
                 .sort((a, b) => {
                     const aProficiency = subject === 'math' ? a.mathProficiency : a.elaProficiency;
                     const bProficiency = subject === 'math' ? b.mathProficiency : b.elaProficiency;
-                    return bProficiency - aProficiency; // Sort by proficiency, highest first
+                    const aEfficiency = aProficiency / a.salary * 100000;
+                    const bEfficiency = bProficiency / b.salary * 100000;
+                    return bEfficiency - aEfficiency; // Sort by efficiency (performance per $100k), highest first
                 })
                 .forEach(d => {
                     const row = tbody.insertRow();
                     const isRiverForest = d.district.includes('River Forest');
                     const proficiency = subject === 'math' ? d.mathProficiency : d.elaProficiency;
+                    const performancePerDollar = (proficiency / d.salary * 100000).toFixed(2); // Performance per $100k salary
 
                     row.innerHTML = `
                         <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">${d.district}</td>
                         <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}">$${d.salary.toLocaleString()}</td>
                         <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">${proficiency.toFixed(1)}%</td>
+                        <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2); font-weight: bold;' : ''}">${performancePerDollar}</td>
                         <td style="${isRiverForest ? 'background-color: rgba(255, 99, 132, 0.2);' : ''}">${d.dataYear}</td>
                     `;
                 });
