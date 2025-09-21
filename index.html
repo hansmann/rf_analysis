@@ -103,11 +103,68 @@
         .subject-selector input[type="radio"] {
             margin-right: 8px;
         }
+        .analysis-summary {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        .analysis-summary h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+        .finding-box {
+            background: white;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .finding-box.highlight {
+            border-left-color: #e74c3c;
+            background: #fff5f5;
+        }
+        .finding-box h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .finding-box p {
+            margin: 0;
+            line-height: 1.6;
+            color: #34495e;
+        }
+        .methodology {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-style: italic;
+            color: #2c5530;
+            border: 1px solid #a8d8a8;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Illinois School Districts<br>Avg Household Income vs Avg Teacher Salary</h1>
+        <h1>River Forest Teacher Salary Competitiveness Analysis</h1>
+        <div class="subtitle">Comprehensive analysis of 31 Illinois school districts comparing teacher compensation, community wealth, and academic performance</div>
+
+        <!-- Executive Summary -->
+        <div class="analysis-summary">
+            <h2>Key Findings</h2>
+            <p><strong>River Forest SD 90 ranks #1-2 in performance per dollar</strong>, achieving exceptional results (76.4% ELA, 66.8% Math proficiency) with below-market teacher compensation. While performance correlates with both income and teacher pay, <strong>significant variation shows higher resources don't guarantee better outcomes</strong> - uncaptured factors, likely including teacher quality and school operations, make a big difference.</p>
+
+            <div class="methodology">
+                <em>Analysis uses 2024 IAR data, 2019-2023 ACS income averages, and ISBE teacher salary data.</em>
+            </div>
+        </div>
+
+        <h2>Detailed Analysis: Household Income vs Teacher Salary</h2>
         <div class="subtitle">2019-2023 ACS 5-year average income data & Illinois teacher salaries</div>
 
         <div class="chart-wrapper">
@@ -204,6 +261,49 @@
                     <li>Proficiency = % of students meeting or exceeding standards</li>
                     <li>Performance per $100k = Proficiency percentage per $100,000 of teacher salary (efficiency metric)</li>
                     <li>Limited to districts with available performance data</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Community Income vs Performance Section -->
+        <div class="performance-section">
+            <h2>Academic Performance vs Community Income Analysis</h2>
+            <div class="subtitle">2024 IAR Results vs 2019-2023 ACS Average Household Income</div>
+
+            <div class="subject-selector">
+                <label>
+                    <input type="radio" name="incomeSubject" value="math" checked> Mathematics
+                </label>
+                <label>
+                    <input type="radio" name="incomeSubject" value="ela"> English Language Arts
+                </label>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="incomePerformanceChart"></canvas>
+            </div>
+
+            <div class="correlation" id="incomePerformanceCorrelation">
+                Income-Performance correlation will be calculated...
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <h3>Community Income vs Performance</h3>
+                    <div id="incomePerformanceStats">Loading...</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Socioeconomic Impact</h3>
+                    <div id="socioeconomicStats">Loading...</div>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>Community Income vs Performance Analysis:</strong>
+                <ul>
+                    <li>Shows relationship between community wealth and academic outcomes</li>
+                    <li>Helps distinguish socioeconomic effects from teacher salary effects</li>
+                    <li>River Forest highlighted to show performance relative to community income</li>
                 </ul>
             </div>
         </div>
@@ -975,6 +1075,176 @@
 
         // Initialize performance chart
         createPerformanceChart('math');
+
+        // Income vs Performance Chart Functionality
+        let incomePerformanceChart;
+        let currentIncomeSubject = 'math';
+
+        // Merge performance data with household income data
+        function createIncomePerformanceData() {
+            const mergedData = [];
+            performanceData.forEach(perfDistrict => {
+                const matchingDistrict = districts.find(d => d.district === perfDistrict.district);
+                if (matchingDistrict) {
+                    mergedData.push({
+                        district: perfDistrict.district,
+                        income: matchingDistrict.income,
+                        mathProficiency: perfDistrict.mathProficiency,
+                        elaProficiency: perfDistrict.elaProficiency,
+                        salary: perfDistrict.salary
+                    });
+                }
+            });
+            return mergedData;
+        }
+
+        function createIncomePerformanceChart(subject) {
+            const ctx = document.getElementById('incomePerformanceChart').getContext('2d');
+
+            if (incomePerformanceChart) {
+                incomePerformanceChart.destroy();
+            }
+
+            const mergedData = createIncomePerformanceData();
+            const data = mergedData.map(d => ({
+                x: d.income,
+                y: subject === 'math' ? d.mathProficiency : d.elaProficiency,
+                label: d.district
+            }));
+
+            const subjectName = subject === 'math' ? 'Mathematics' : 'English Language Arts';
+
+            // Calculate regression line
+            const incomes = mergedData.map(d => d.income);
+            const scores = mergedData.map(d => subject === 'math' ? d.mathProficiency : d.elaProficiency);
+
+            const n = incomes.length;
+            const sumX = incomes.reduce((a, b) => a + b, 0);
+            const sumY = scores.reduce((a, b) => a + b, 0);
+            const sumXY = incomes.reduce((sum, x, i) => sum + x * scores[i], 0);
+            const sumX2 = incomes.reduce((sum, x) => sum + x * x, 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const minIncome = Math.min(...incomes);
+            const maxIncome = Math.max(...incomes);
+            const regressionLine = [
+                { x: minIncome, y: slope * minIncome + intercept },
+                { x: maxIncome, y: slope * maxIncome + intercept }
+            ];
+
+            incomePerformanceChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'School Districts',
+                            data: data,
+                            backgroundColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)'
+                            ),
+                            borderColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+                            ),
+                            borderWidth: data.map(d =>
+                                d.label.includes('River Forest') ? 3 : 2
+                            ),
+                            pointRadius: data.map(d =>
+                                d.label.includes('River Forest') ? 12 : 8
+                            )
+                        },
+                        {
+                            label: 'Regression Line',
+                            data: regressionLine,
+                            type: 'line',
+                            borderColor: 'rgba(255, 165, 0, 0.8)',
+                            backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${subjectName} Proficiency vs Avg Household Income`,
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].raw.label;
+                                },
+                                label: function(context) {
+                                    return [
+                                        `Income: $${context.parsed.x.toLocaleString()}`,
+                                        `${subjectName} Proficiency: ${context.parsed.y.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Avg Household Income ($)',
+                                font: { weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000).toFixed(0) + 'k';
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: `${subjectName} Proficiency (%)`,
+                                font: { weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Update correlation and stats
+            const correlation = calculateCorrelation(incomes, scores);
+
+            document.getElementById('incomePerformanceCorrelation').innerHTML = `
+                ${subjectName} Performance vs Community Income Correlation: r = ${correlation.toFixed(3)}
+            `;
+
+            document.getElementById('incomePerformanceStats').innerHTML = `
+                Income Range: $${Math.min(...incomes).toLocaleString()} - $${Math.max(...incomes).toLocaleString()}<br>
+                Performance Range: ${Math.min(...scores).toFixed(1)}% - ${Math.max(...scores).toFixed(1)}%
+            `;
+
+            document.getElementById('socioeconomicStats').innerHTML = `
+                Correlation Strength: ${correlation > 0.7 ? 'Strong' : correlation > 0.3 ? 'Moderate' : 'Weak'}<br>
+                Socioeconomic Impact: ${correlation > 0.5 ? 'Significant' : 'Limited'}
+            `;
+        }
+
+        // Income subject selection event listeners
+        document.querySelectorAll('input[name="incomeSubject"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentIncomeSubject = this.value;
+                createIncomePerformanceChart(currentIncomeSubject);
+            });
+        });
+
+        // Initialize income performance chart
+        createIncomePerformanceChart('math');
     </script>
 </body>
 </html>
