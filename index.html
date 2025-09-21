@@ -185,16 +185,6 @@
             Correlation will be calculated...
         </div>
 
-        <div class="stats">
-            <div class="stat-box">
-                <h3>Avg Household Income (2019-2023)</h3>
-                <div id="incomeStats">Loading...</div>
-            </div>
-            <div class="stat-box">
-                <h3>Avg Teacher Salary</h3>
-                <div id="salaryStats">Loading...</div>
-            </div>
-        </div>
 
         <table>
             <thead>
@@ -240,16 +230,6 @@
                 Performance correlation will be calculated...
             </div>
 
-            <div class="stats">
-                <div class="stat-box">
-                    <h3>Academic Performance (2024)</h3>
-                    <div id="performanceStats">Loading...</div>
-                </div>
-                <div class="stat-box">
-                    <h3>Performance vs Salary</h3>
-                    <div id="performanceSalaryStats">Loading...</div>
-                </div>
-            </div>
 
             <table>
                 <thead>
@@ -297,16 +277,6 @@
                 Income-Performance correlation will be calculated...
             </div>
 
-            <div class="stats">
-                <div class="stat-box">
-                    <h3>Community Income vs Performance</h3>
-                    <div id="incomePerformanceStats">Loading...</div>
-                </div>
-                <div class="stat-box">
-                    <h3>Socioeconomic Impact</h3>
-                    <div id="socioeconomicStats">Loading...</div>
-                </div>
-            </div>
 
             <div class="note">
                 <strong>Community Income vs Performance Analysis:</strong>
@@ -765,16 +735,6 @@
             Correlation: r = ${correlation.toFixed(3)} (${correlation > 0.7 ? 'Strong' : correlation > 0.3 ? 'Moderate' : 'Weak'} Positive)
         `;
 
-        // Update stats
-        document.getElementById('incomeStats').innerHTML = `
-            Range: $${Math.min(...incomes).toLocaleString()} - $${Math.max(...incomes).toLocaleString()}<br>
-            Average: $${Math.round(incomes.reduce((a, b) => a + b) / incomes.length).toLocaleString()}
-        `;
-
-        document.getElementById('salaryStats').innerHTML = `
-            Range: $${Math.min(...salaries).toLocaleString()} - $${Math.max(...salaries).toLocaleString()}<br>
-            Average: $${Math.round(salaries.reduce((a, b) => a + b) / salaries.length).toLocaleString()}
-        `;
 
         // Calculate trend line
         const n = incomes.length;
@@ -1033,11 +993,6 @@
                 ${subjectName} Performance vs Salary Correlation: r = ${correlation.toFixed(3)}
             `;
 
-            // Update stats
-            document.getElementById('performanceStats').innerHTML = `
-                Range: ${Math.min(...scores).toFixed(1)}% - ${Math.max(...scores).toFixed(1)}%<br>
-                Average: ${(scores.reduce((a, b) => a + b) / scores.length).toFixed(1)}%
-            `;
 
             // Update table
             updatePerformanceTable(subject);
@@ -1234,15 +1189,6 @@
                 ${subjectName} Performance vs Community Income Correlation: r = ${correlation.toFixed(3)}
             `;
 
-            document.getElementById('incomePerformanceStats').innerHTML = `
-                Income Range: $${Math.min(...incomes).toLocaleString()} - $${Math.max(...incomes).toLocaleString()}<br>
-                Performance Range: ${Math.min(...scores).toFixed(1)}% - ${Math.max(...scores).toFixed(1)}%
-            `;
-
-            document.getElementById('socioeconomicStats').innerHTML = `
-                Correlation Strength: ${correlation > 0.7 ? 'Strong' : correlation > 0.3 ? 'Moderate' : 'Weak'}<br>
-                Socioeconomic Impact: ${correlation > 0.5 ? 'Significant' : 'Limited'}
-            `;
         }
 
         // Income subject selection event listeners
