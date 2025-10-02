@@ -169,8 +169,10 @@
             <h2>Key Findings</h2>
             <p><strong>River Forest SD 90 ranks #1-2 in performance per dollar</strong>, achieving exceptional results (76.4% ELA, 66.8% Math proficiency) with below-market teacher compensation. While performance correlates with both income and teacher pay, <strong>significant variation shows higher resources don't guarantee better outcomes</strong> - uncaptured factors, likely including teacher quality and school operations, make a big difference.</p>
 
+            <p style="margin-top: 15px;"><strong>River Forest per-student spending is about average for the cohort analyzed.</strong> There doesn't appear to be a statistically relevant correlation between per-student spending and performance, suggesting that how money is spent matters more than total spending levels.</p>
+
             <div class="methodology">
-                <em>Analysis uses 2024 IAR data, 2019-2023 ACS income averages, and ISBE teacher salary data.</em>
+                <em>Analysis uses 2024 IAR data, 2019-2023 ACS income averages, ISBE teacher salary data, and district spending per student.</em>
             </div>
         </div>
 
@@ -287,6 +289,85 @@
                 </ul>
             </div>
         </div>
+
+        <!-- Spending per Student vs Household Income Section -->
+        <div class="performance-section">
+            <h2>Spending per Student vs Household Income Analysis</h2>
+            <div class="subtitle">District Spending Efficiency</div>
+
+            <div class="chart-wrapper">
+                <canvas id="spendingChart"></canvas>
+            </div>
+
+            <div class="correlation" id="spendingCorrelation">
+                Spending correlation will be calculated...
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>District</th>
+                        <th>Average Household Income</th>
+                        <th>Spending per Student</th>
+                    </tr>
+                </thead>
+                <tbody id="spendingTableBody"></tbody>
+            </table>
+
+            <div class="note">
+                <strong>Spending per Student Analysis:</strong>
+                <ul>
+                    <li>Shows relationship between community wealth and district spending</li>
+                    <li>Higher spending doesn't always correlate with higher income</li>
+                    <li>River Forest highlighted for comparison</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Spending per Student vs Performance Section -->
+        <div class="performance-section">
+            <h2>Spending per Student vs Academic Performance</h2>
+            <div class="subtitle">Does More Spending Lead to Better Outcomes?</div>
+
+            <div class="subject-selector">
+                <label>
+                    <input type="radio" name="spendingSubject" value="math" checked> Mathematics
+                </label>
+                <label>
+                    <input type="radio" name="spendingSubject" value="ela"> English Language Arts
+                </label>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="spendingPerformanceChart"></canvas>
+            </div>
+
+            <div class="correlation" id="spendingPerformanceCorrelation">
+                Spending-Performance correlation will be calculated...
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>District</th>
+                        <th>Spending per Student</th>
+                        <th id="spendingPerfHeader">Math Proficiency (%)</th>
+                        <th id="spendingEfficiencyHeader">Performance per $1,000</th>
+                    </tr>
+                </thead>
+                <tbody id="spendingPerformanceTableBody"></tbody>
+            </table>
+
+            <div class="note">
+                <strong>Spending per Student vs Performance Analysis:</strong>
+                <ul>
+                    <li>Examines whether higher per-student spending correlates with better academic outcomes</li>
+                    <li>Performance per $1,000 = Proficiency percentage per $1,000 of spending (efficiency metric)</li>
+                    <li>Helps evaluate return on investment in education spending</li>
+                    <li>River Forest highlighted for comparison</li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -296,30 +377,35 @@
                 district: "River Forest SD 90",
                 income: 245054,
                 salary: 77631,  // Illinois Report Card - $1,652 above state avg
+                spendingPerStudent: 21000,
                 source: "Illinois Report Card 2024"
             },
             {
                 district: "Hinsdale CCSD 181",
                 income: 376366,
                 salary: 98222,  // From JSON endpoint 2024
+                spendingPerStudent: 21000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Winnetka SD 36",
                 income: 457404,
                 salary: 98072,  // From JSON endpoint 2024
+                spendingPerStudent: 28000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Lake Forest SD 67",
                 income: 302171,
                 salary: 89256,  // From JSON endpoint 2024
+                spendingPerStudent: 25000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Elmwood Park CUSD 401",
                 income: 101036,
                 salary: 83681,  // From JSON endpoint 2024
+                spendingPerStudent: 16000,
                 source: "Illinois ISBE 2024"
             },
             {
@@ -332,36 +418,42 @@
                 district: "Forest Park SD 91",
                 income: 109157,
                 salary: 77941,  // From JSON endpoint 2024
+                spendingPerStudent: 31000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Melrose Park ESD 89",
                 income: 64740,
                 salary: 73406,  // From JSON endpoint 2024
+                spendingPerStudent: 21000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Kenilworth SD 38",
                 income: 460411,
                 salary: 103079,  // From JSON endpoint 2024
+                spendingPerStudent: 32000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Oak Park ESD 97",
                 income: 157707,
                 salary: 85619,  // From JSON endpoint 2024
+                spendingPerStudent: 19000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Evanston/Skokie SD 65",
                 income: 159197,
                 salary: 91558,  // From JSON endpoint 2024
+                spendingPerStudent: 26000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Downers Grove GSD 58",
                 income: 163851,
                 salary: 91729,  // From JSON endpoint 2024
+                spendingPerStudent: 18000,
                 source: "Illinois ISBE 2024"
             },
             {
@@ -374,42 +466,49 @@
                 district: "Deerfield SD 109",
                 income: 246543,
                 salary: 83273,  // From JSON endpoint 2023
+                spendingPerStudent: 22000,
                 source: "Illinois ISBE 2023"
             },
             {
                 district: "Oak Brook (Butler 53)",
                 income: 264446,
                 salary: 86720,  // Previously verified
+                spendingPerStudent: 27000,
                 source: "District average"
             },
             {
                 district: "Park Ridge CCSD 64",
                 income: 187830,
                 salary: 94637,  // From JSON endpoint 2024
+                spendingPerStudent: 19000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Elmhurst CUSD 205",
                 income: 200730,
                 salary: 93125,  // From JSON endpoint 2024
+                spendingPerStudent: 19000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Northbrook SD 28",
                 income: 218418,
                 salary: 97923,  // From JSON endpoint 2023
+                spendingPerStudent: 28000,
                 source: "Illinois ISBE 2023"
             },
             {
                 district: "Glenview CCSD 34",
                 income: 199761,
                 salary: 81377,  // From JSON endpoint 2023
+                spendingPerStudent: 20000,
                 source: "Illinois ISBE 2023"
             },
             {
                 district: "Wilmette SD 39",
                 income: 291930,
                 salary: 86561,  // From JSON endpoint 2024
+                spendingPerStudent: 22000,
                 source: "Illinois ISBE 2024"
             },
             {
@@ -422,18 +521,21 @@
                 district: "Barrington CUSD 220",
                 income: 209856,
                 salary: 93926,  // From JSON endpoint 2023
+                spendingPerStudent: 21000,
                 source: "Illinois ISBE 2023"
             },
             {
                 district: "Arlington Heights SD 25",
                 income: 147683,
                 salary: 78022,  // From JSON endpoint 2024
+                spendingPerStudent: 17000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Cicero SD 99",
                 income: 83618,
                 salary: 85635,  // From JSON endpoint 2024
+                spendingPerStudent: 21000,
                 source: "Illinois ISBE 2024"
             },
             {
@@ -452,36 +554,49 @@
                 district: "La Grange SD 102",
                 income: 210646,
                 salary: 75978,  // From JSON endpoint 2024
+                spendingPerStudent: 17000,
                 source: "Illinois ISBE 2024"
+            },
+            {
+                district: "Western Springs SD 101",
+                income: 218839,
+                salary: 77500,
+                spendingPerStudent: 15000,
+                source: "District data"
             },
             {
                 district: "Burr Ridge SD 180",
                 income: 242236,
                 salary: 76259,  // From JSON endpoint 2022
+                spendingPerStudent: 28000,
                 source: "Illinois ISBE 2022"
             },
             {
                 district: "Naperville CUSD 203",
                 income: 192516,
                 salary: 88756,  // From JSON endpoint 2024
+                spendingPerStudent: 19000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Glen Ellyn SD 41",
                 income: 190562,
                 salary: 87335,  // From JSON endpoint 2024
+                spendingPerStudent: 16000,
                 source: "Illinois ISBE 2024"
             },
             {
                 district: "Northfield SD 31",
                 income: 281510,
                 salary: 79132,  // From JSON endpoint 2023
+                spendingPerStudent: 26000,
                 source: "Illinois ISBE 2023"
             },
             {
                 district: "Glencoe SD 35",
                 income: 413718,
                 salary: 102049,  // From JSON endpoint 2024
+                spendingPerStudent: 26000,
                 source: "Illinois ISBE 2024"
             }
         ];
@@ -675,6 +790,13 @@
                 salary: 76259,
                 mathProficiency: 10.4,
                 elaProficiency: 36.6,
+                dataYear: "2024"
+            },
+            {
+                district: "Western Springs SD 101",
+                salary: 77500,
+                mathProficiency: 63.8,
+                elaProficiency: 72.1,
                 dataYear: "2024"
             },
             {
@@ -1201,6 +1323,351 @@
 
         // Initialize income performance chart
         createIncomePerformanceChart('math');
+
+        // Spending per Student Chart
+        let spendingChart = null;
+
+        function createSpendingChart() {
+            const ctx = document.getElementById('spendingChart').getContext('2d');
+
+            if (spendingChart) {
+                spendingChart.destroy();
+            }
+
+            // Filter districts with spending data
+            const spendingData = districts.filter(d => d.spendingPerStudent);
+            const data = spendingData.map(d => ({
+                x: d.income,
+                y: d.spendingPerStudent,
+                label: d.district
+            }));
+
+            // Calculate regression line
+            const incomes = spendingData.map(d => d.income);
+            const spending = spendingData.map(d => d.spendingPerStudent);
+
+            const n = incomes.length;
+            const sumX = incomes.reduce((a, b) => a + b, 0);
+            const sumY = spending.reduce((a, b) => a + b, 0);
+            const sumXY = incomes.reduce((sum, x, i) => sum + x * spending[i], 0);
+            const sumX2 = incomes.reduce((sum, x) => sum + x * x, 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const minIncome = Math.min(...incomes);
+            const maxIncome = Math.max(...incomes);
+            const regressionLine = [
+                { x: minIncome, y: slope * minIncome + intercept },
+                { x: maxIncome, y: slope * maxIncome + intercept }
+            ];
+
+            spendingChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'School Districts',
+                            data: data,
+                            backgroundColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)'
+                            ),
+                            borderColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+                            ),
+                            borderWidth: data.map(d =>
+                                d.label.includes('River Forest') ? 3 : 2
+                            ),
+                            pointRadius: data.map(d =>
+                                d.label.includes('River Forest') ? 12 : 8
+                            )
+                        },
+                        {
+                            label: 'Regression Line',
+                            data: regressionLine,
+                            type: 'line',
+                            borderColor: 'rgba(255, 165, 0, 0.8)',
+                            backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Spending per Student vs Avg Household Income',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].raw.label;
+                                },
+                                label: function(context) {
+                                    return [
+                                        `Income: $${context.parsed.x.toLocaleString()}`,
+                                        `Spending per Student: $${context.parsed.y.toLocaleString()}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Avg Household Income ($)',
+                                font: { weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000).toFixed(0) + 'k';
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Spending per Student ($)',
+                                font: { weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000).toFixed(0) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update correlation and populate table
+            const correlation = calculateCorrelation(incomes, spending);
+            document.getElementById('spendingCorrelation').innerHTML = `
+                Spending per Student vs Household Income Correlation: r = ${correlation.toFixed(3)}
+            `;
+
+            // Populate table
+            const tableBody = document.getElementById('spendingTableBody');
+            tableBody.innerHTML = '';
+            spendingData
+                .sort((a, b) => b.spendingPerStudent - a.spendingPerStudent)
+                .forEach(district => {
+                    const row = document.createElement('tr');
+                    if (district.district.includes('River Forest')) {
+                        row.style.backgroundColor = '#ffebee';
+                        row.style.fontWeight = 'bold';
+                    }
+                    row.innerHTML = `
+                        <td>${district.district}</td>
+                        <td>$${district.income.toLocaleString()}</td>
+                        <td>$${district.spendingPerStudent.toLocaleString()}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+        }
+
+        // Initialize spending chart
+        createSpendingChart();
+
+        // Spending per Student vs Performance Chart
+        let spendingPerformanceChart = null;
+        let currentSpendingSubject = 'math';
+
+        function createSpendingPerformanceData() {
+            // Merge districts with performance data and spending data
+            const mergedData = [];
+            performanceData.forEach(perf => {
+                const district = districts.find(d => d.district === perf.district);
+                if (district && district.spendingPerStudent) {
+                    mergedData.push({
+                        district: district.district,
+                        spendingPerStudent: district.spendingPerStudent,
+                        mathProficiency: perf.mathProficiency,
+                        elaProficiency: perf.elaProficiency
+                    });
+                }
+            });
+            return mergedData;
+        }
+
+        function createSpendingPerformanceChart(subject) {
+            const ctx = document.getElementById('spendingPerformanceChart').getContext('2d');
+
+            if (spendingPerformanceChart) {
+                spendingPerformanceChart.destroy();
+            }
+
+            const mergedData = createSpendingPerformanceData();
+            const data = mergedData.map(d => ({
+                x: d.spendingPerStudent,
+                y: subject === 'math' ? d.mathProficiency : d.elaProficiency,
+                label: d.district
+            }));
+
+            const subjectName = subject === 'math' ? 'Mathematics' : 'English Language Arts';
+
+            // Calculate regression line
+            const spending = mergedData.map(d => d.spendingPerStudent);
+            const scores = mergedData.map(d => subject === 'math' ? d.mathProficiency : d.elaProficiency);
+
+            const n = spending.length;
+            const sumX = spending.reduce((a, b) => a + b, 0);
+            const sumY = scores.reduce((a, b) => a + b, 0);
+            const sumXY = spending.reduce((sum, x, i) => sum + x * scores[i], 0);
+            const sumX2 = spending.reduce((sum, x) => sum + x * x, 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const minSpending = Math.min(...spending);
+            const maxSpending = Math.max(...spending);
+            const regressionLine = [
+                { x: minSpending, y: slope * minSpending + intercept },
+                { x: maxSpending, y: slope * maxSpending + intercept }
+            ];
+
+            spendingPerformanceChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'School Districts',
+                            data: data,
+                            backgroundColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)'
+                            ),
+                            borderColor: data.map(d =>
+                                d.label.includes('River Forest') ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+                            ),
+                            borderWidth: data.map(d =>
+                                d.label.includes('River Forest') ? 3 : 2
+                            ),
+                            pointRadius: data.map(d =>
+                                d.label.includes('River Forest') ? 12 : 8
+                            )
+                        },
+                        {
+                            label: 'Regression Line',
+                            data: regressionLine,
+                            type: 'line',
+                            borderColor: 'rgba(255, 165, 0, 0.8)',
+                            backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: false,
+                            tension: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${subjectName} Proficiency vs Spending per Student`,
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].raw.label;
+                                },
+                                label: function(context) {
+                                    return [
+                                        `Spending: $${context.parsed.x.toLocaleString()}`,
+                                        `${subjectName} Proficiency: ${context.parsed.y.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Spending per Student ($)',
+                                font: { weight: 'bold' }
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value/1000).toFixed(0) + 'k';
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: `${subjectName} Proficiency (%)`,
+                                font: { weight: 'bold' }
+                            },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Update correlation
+            const correlation = calculateCorrelation(spending, scores);
+
+            document.getElementById('spendingPerformanceCorrelation').innerHTML = `
+                ${subjectName} Performance vs Spending per Student Correlation: r = ${correlation.toFixed(3)}
+            `;
+
+            // Update table header
+            document.getElementById('spendingPerfHeader').textContent =
+                subject === 'math' ? 'Math Proficiency (%)' : 'ELA Proficiency (%)';
+            document.getElementById('spendingEfficiencyHeader').textContent =
+                subject === 'math' ? 'Math Performance per $1,000' : 'ELA Performance per $1,000';
+
+            // Populate table
+            const tableBody = document.getElementById('spendingPerformanceTableBody');
+            tableBody.innerHTML = '';
+
+            const tableData = mergedData.map(d => ({
+                ...d,
+                proficiency: subject === 'math' ? d.mathProficiency : d.elaProficiency,
+                efficiency: (subject === 'math' ? d.mathProficiency : d.elaProficiency) / (d.spendingPerStudent / 1000)
+            }));
+
+            tableData
+                .sort((a, b) => b.efficiency - a.efficiency)
+                .forEach(district => {
+                    const row = document.createElement('tr');
+                    if (district.district.includes('River Forest')) {
+                        row.style.backgroundColor = '#ffebee';
+                        row.style.fontWeight = 'bold';
+                    }
+                    row.innerHTML = `
+                        <td>${district.district}</td>
+                        <td>$${district.spendingPerStudent.toLocaleString()}</td>
+                        <td>${district.proficiency.toFixed(1)}%</td>
+                        <td>${district.efficiency.toFixed(2)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+        }
+
+        // Spending subject selection event listeners
+        document.querySelectorAll('input[name="spendingSubject"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                currentSpendingSubject = this.value;
+                createSpendingPerformanceChart(currentSpendingSubject);
+            });
+        });
+
+        // Initialize spending performance chart
+        createSpendingPerformanceChart('math');
     </script>
 </body>
 </html>
